@@ -30,14 +30,15 @@ class User < ActiveRecord::Base
         if self.balance >= amount
         self.balance -= amount
         self.save
-        "You have withdrawn $#{amount}. Your new balance is $#{balance}"
         else
             "Declined: Insufficient Funds."
         end
     end
     def history
+
+        pastel =Pastel.new
         pays = Payment.all.where(user_id: self.id)
-        pays.map{|entry| puts "You sent $#{entry.amount} to #{User.find(entry.recipient_user_id).name} on #{entry.created_at}."}
+        pays.map{|entry| puts pastel.green("You sent $#{entry.amount} to #{User.find(entry.recipient_user_id).name} on #{entry.created_at}.")}
 
     end
     def most_frequent
