@@ -38,11 +38,19 @@ class User < ActiveRecord::Base
 
         pastel =Pastel.new
         pays = Payment.all.where(user_id: self.id)
-        pays.map{|entry| puts pastel.green("You sent $#{entry.amount} to #{User.find(entry.recipient_user_id).name} on #{entry.created_at}.")}
+        received = Payment.all.where(recipient_user_id: self.id)
+        pays.map{|entry| puts pastel.red("You sent $#{entry.amount} to #{if User.find_by(id: entry.recipient_user_id) == nil 
+        "a user that has deleted their account" else User.find_by(id: entry.recipient_user_id).name end} on #{entry.created_at}.")}
+        received.map{|entry| puts pastel.green("You received $#{entry.amount} from #{if User.find_by(id: entry.recipient_user_id) == nil 
+        "a user that has deleted their account" else User.find_by(id: entry.recipient_user_id).name end} on #{entry.created_at}.")}
+        
 
     end
     def most_frequent
-        history.group_by('recipient_user_id').order('COUNT(*) DESC') #Need help with this. "Wrong number of args error?"
+        return_id = Payment.all.where(user_id: self.id).group('recipient_user_id').order('COUNT(*) DESC').select('recipient_user_id').limit(1)
+
+        binding.pry
+
     end
 
 

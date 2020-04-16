@@ -11,6 +11,7 @@ class AppCLI
         puts pastel.cyan("Your new available balance is $#{user.balance}.")
     end
 
+
     def main_user_interface(user)
         prompt = TTY::Prompt.new
         pastel = Pastel.new
@@ -25,6 +26,8 @@ class AppCLI
             menu.choice 'Chack transaction history', 5
             menu.choice 'See frequent expenses', 6
             menu.choice 'Logout', 7
+            menu.choice pastel.red('Delete Account'), 8
+            menu.choice 'Who Am I', 9
         end
 
             case choice 
@@ -44,24 +47,46 @@ class AppCLI
                 get_amount =prompt.ask("Enter the transfer amount:").to_i
                 recipient = prompt.ask('Who would you like to transfer funds to?')
                 recipient_instance = User.find_by name: recipient
-                user.make_payment(get_amount, recipient_instance.Invalid)
+                if !User.all.include?(recipient)
+                    puts pastel.red("This user could not be found, please try again")
+
+                else
+                    user.make_payment(get_amount, recipient_instance.id)
+                end
+                
             when 5
                 user.history
             when 6
                 puts "feature coming soon"
             when 7 
                 login_screen
-            end
+            when 8 
+                choice = prompt.select("Are you sure you want to go through with this?", %w(Yes No))
+                case choice
+                when "Yes"
+                    user.destroy
+                when "No"
+                    main_user_interface(user)
+                else 
+                    "Invalid Selection"
+                end
+            when 9 
+               puts user.name 
+                puts "User no.#{user.id}" 
+                puts "balance of $#{user.balance}"
+
+            end 
+
         end
     end
 
     def create_user
         prompt = TTY::Prompt.new
-        name = prompt.ask("Enter your name")
-        email = prompt.ask("Enter your email address")
+        name = prompt.ask("Enter your name", required: true)
+        email = prompt.ask("Enter your email address", required: true) { |q| q.validate :email }
         User.create(name: name, email: email, balance: 0)
         pastel = Pastel.new 
-        puts pastel.magenta("Welcome to SafeBank #{name}! \n Please press 2. to login")
+        puts pastel.magenta("Welcome to SafeBank #{name}! \n Please login")
         login_screen
     end
     def choose_user
@@ -78,12 +103,12 @@ class AppCLI
     
     def login_screen
         prompt = TTY::Prompt.new
-        choice = prompt.select('Press 1. for New User or 2. for Existing User?', %w(1 2))
+        choice = prompt.select('Are you a New or Existing User?', %w(New_User Existing_User))
 
         case choice
-        when "1"
+        when "New_User"
             create_user
-        when "2"
+        when "Existing_User"
             choose_user
         else 
             "Invalid Selection"
