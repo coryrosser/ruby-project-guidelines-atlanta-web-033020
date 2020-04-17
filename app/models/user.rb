@@ -42,19 +42,26 @@ class User < ActiveRecord::Base
         pays.map{|entry| puts pastel.red("You sent $#{entry.amount} to #{if User.find_by(id: entry.recipient_user_id) == nil 
         "a user that has deleted their account" else User.find_by(id: entry.recipient_user_id).name end} on #{entry.created_at}.")}
         received.map{|entry| puts pastel.green("You received $#{entry.amount} from #{if User.find_by(id: entry.user_id) == nil 
-        "a user that has deleted their account" else User.find_by(id: entry.recipient_user_id).name end} on #{entry.created_at}.")}
+        "a user that has deleted their account" else User.find_by(id: entry.user_id).name end} on #{entry.created_at}.")}
         
 
     end
+
+    def delete_account
+        binding.pry
+        Payment.where(user_id: self.id).update_all user_id: 28
+        self.destroy
+        binding.pry
+    end
+
     def most_frequent
         pastel=Pastel.new
         return_id = Payment.all.where(user_id: self.id).group('recipient_user_id').order('COUNT(*) DESC').first.recipient_user_id
-
-
+        binding.pry
         if User.find_by id: return_id == nil
              puts pastel.yellow("The user you send money to most has deleted their account. How sad.")
         else 
-            puts pastel.yellow("You send money to #{User.find(return_id).name} more than anyone else.")
+            puts pastel.yellow("You send money to #{User.find_by(id: return_id).name} more than anyone else.")
 
         end
 

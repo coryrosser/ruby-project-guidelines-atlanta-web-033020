@@ -71,7 +71,8 @@ class AppCLI
                 choice = prompt.select("Are you sure you want to go through with this?", %w(Yes No))
                 case choice
                 when "Yes"
-                    user.destroy
+                    user.delete_account
+                    login_screen
                 when "No"
                     main_user_interface(user)
                 else 
@@ -101,7 +102,7 @@ class AppCLI
         user_list = User.all.map{|user| user.name}
         
         
-       user_name = prompt.select("Select your name! Dont peek at other peoples accounts!", user_list)
+       user_name = prompt.select("Select your name! Dont peek at other peoples accounts!", user_list - ["Admin"])
        active_user_instance = User.find_by name: user_name
        #binding.pry
        main_user_interface(active_user_instance)
@@ -125,9 +126,10 @@ class AppCLI
         
     end
     def run 
+
         pastel = Pastel.new
         font = TTY::Font.new(:starwars)
-        puts pastel.cyan(font.write("SafeBank"))
+        puts pastel.yellow(font.write("SafeBank"))
         puts pastel.cyan("No better place to store all your sensitive information!")
         login_screen
     end
