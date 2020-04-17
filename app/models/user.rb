@@ -48,16 +48,13 @@ class User < ActiveRecord::Base
     end
 
     def delete_account
-        binding.pry
         Payment.where(user_id: self.id).update_all user_id: 28
         self.destroy
-        binding.pry
     end
 
     def most_frequent
         pastel=Pastel.new
         return_id = Payment.all.where(user_id: self.id).group('recipient_user_id').order('COUNT(*) DESC').first.recipient_user_id
-        binding.pry
         if User.find_by id: return_id == nil
              puts pastel.yellow("The user you send money to most has deleted their account. How sad.")
         else 

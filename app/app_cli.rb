@@ -102,7 +102,7 @@ class AppCLI
         user_list = User.all.map{|user| user.name}
         
         
-       user_name = prompt.select("Select your name! Dont peek at other peoples accounts!", user_list - ["Admin"])
+       user_name = prompt.select("Select your name! Dont peek at other peoples accounts!", user_list - ["Deleted Account"])
        active_user_instance = User.find_by name: user_name
        #binding.pry
        main_user_interface(active_user_instance)
