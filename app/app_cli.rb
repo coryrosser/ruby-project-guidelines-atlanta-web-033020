@@ -23,7 +23,7 @@ class AppCLI
             menu.choice 'Make a deposit', 2
             menu.choice 'Make a withdrawal', 3
             menu.choice 'Transfer funds to another user', 4
-            menu.choice 'Chack transaction history', 5
+            menu.choice 'Check transaction history', 5
             menu.choice 'See frequent expenses', 6
             menu.choice 'Logout', 7
             menu.choice pastel.red('Delete Account'), 8
@@ -41,23 +41,30 @@ class AppCLI
 
             when 3
                 get_amount =prompt.ask("Enter the withdrawal amount:").to_i
-                user.withdraw(get_amount)
-                tell_balance(user)
+                if user.balance >= get_amount 
+                    user.withdraw(get_amount)
+                    tell_balance(user)
+                else puts pastel.red("Declined. Insufficient funds.") 
+                end
+
+                
             when 4 
                 get_amount =prompt.ask("Enter the transfer amount:").to_i
                 recipient = prompt.ask('Who would you like to transfer funds to?')
                 recipient_instance = User.find_by name: recipient
-                if !User.all.include?(recipient)
-                    puts pastel.red("This user could not be found, please try again")
-
-                else
+                if User.all.include?(recipient_instance)
                     user.make_payment(get_amount, recipient_instance.id)
+                    puts pastel.green("Transfer Successful")
+
+                else 
+                    puts pastel.red("This user could not be found, please try again")
+                    
                 end
                 
             when 5
                 user.history
             when 6
-                puts "feature coming soon"
+                user.most_frequent
             when 7 
                 login_screen
             when 8 
@@ -71,9 +78,9 @@ class AppCLI
                     "Invalid Selection"
                 end
             when 9 
-               puts user.name 
+               puts user.name
                 puts "User no.#{user.id}" 
-                puts "balance of $#{user.balance}"
+                puts "Balance of $#{user.balance}"
 
             end 
 
